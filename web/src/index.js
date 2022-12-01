@@ -1,8 +1,3 @@
-import regions from './modules/regions'
-// import 
-
-// regions()
-
 ymaps.ready(init);
 
 function init () {
@@ -34,39 +29,6 @@ function init () {
     myMap.controls.remove('zoomControl')
     myMap.geoObjects.add(objectManager);
 
-    // Создадим 9 пунктов выпадающего списка.
-    var listBoxItems = ['Офис банка (в т.ч. передвижной пункт)', 'Удаленная точка банк. обслуживания', 'Банкомат (с использованием банк. карт)', 'Банкомат (без использования банк. карт)', 'Банковские услуги в отделениях Почты России', 'Точка выдачи наличных в магазине', 'Точка оплаты наличными', 'Микрофинансовая организация', 'Страховая организация']
-            .map(function (title) {
-                return new ymaps.control.ListBoxItem({
-                    data: {
-                        content: title
-                    },
-                    state: {
-                        selected: true
-                    }
-                })
-            }),
-        reducer = function (filters, filter) {
-            filters[filter.data.get('content')] = filter.isSelected();
-            return filters;
-        },
-                
-        // Теперь создадим список, содержащий 9 пунктов.
-        listBoxControl = new ymaps.control.ListBox({
-            data: {
-                content: 'Фильтр',
-                title: 'Выберите требуемую категорию'
-            },
-            items: listBoxItems,
-            state: {
-                // Признак, развернут ли список.
-                expanded: false,
-                filters: listBoxItems.reduce(reducer, {})
-            },
-        });
-        // console.log(listBoxItems);
-    myMap.controls.add(listBoxControl);
-
     var zoomControl = new ymaps.control.ZoomControl({
         options: {
             size: "small",
@@ -77,34 +39,6 @@ function init () {
         }
     });
     myMap.controls.add(zoomControl);
-
-    // Добавим отслеживание изменения признака, выбран ли пункт списка.
-    listBoxControl.events.add(['select', 'deselect'], function (e) {
-        var listBoxItem = e.get('target');
-        var filters = ymaps.util.extend({}, listBoxControl.state.get('filters'));
-        // console.log(filters);
-        // console.log(listBoxControl.state.get('filters'));
-        filters[listBoxItem.data.get('content')] = listBoxItem.isSelected();
-        //alert(filters[0])
-        console.log(filters);
-        listBoxControl.state.set('filters', filters);
-    });
-
-    // создается монитор отслеживающий изменения в listBox
-    var filterMonitor = new ymaps.Monitor(listBoxControl.state);
-    filterMonitor.add('filters', function (filters) {
-        // Применим фильтр.
-        console.log(filters);
-        objectManager.setFilter(getFilterFunction(filters));
-
-    });
-
-    function getFilterFunction(categories) {
-        return function (obj) {
-            var content = obj.properties.typeObject;
-            return categories[content]
-        }
-    }
 
     let regions = [{
         id: 1,
@@ -256,6 +190,7 @@ function init () {
     const sidenav = document.querySelector('.sidenav')
     let triangleOpen = false
     let menuOpen = false;
+    const nameList = document.querySelector('.name_list')
     const sidenavHeader = document.querySelector('.filter_container') // переменные
 
     const border1 = document.createElement('span')
@@ -291,8 +226,6 @@ function init () {
         menuSwitch()
     }) // изменение переменной menuOpen вследствии клика по кнопке меню
 
-    const nameList = document.querySelector('.name_list')
-
     let triangle = document.createElement('span')
     triangle.classList.add('triangle')
     nameList.append(triangle)
@@ -321,8 +254,21 @@ function init () {
                 let link = document.createElement('a')
                 link.classList.add('menu__link')
                 link.textContent = `${key}`
-                console.log(filtersList[key]);
                 listItem.append(link)
+
+                let icon = document.createElement('span')
+                icon.classList.add('icon')
+                key == 'Офис банка (в т.ч. передвижной пункт)' ? icon.style.cssText = 'border: 7px solid rgb(238 67 68);' : console.log('g');
+                key == 'Удаленная точка банк. обслуживания' ? icon.style.cssText = 'border: 7px solid rgb(238 67 68);' : console.log('g');
+                key == 'Банкомат (с использованием банк. карт)' ? icon.style.cssText = 'border: 7px solid rgb(82 221 81);' : console.log('g');
+                key == 'Банкомат (без использования банк. карт)' ? icon.style.cssText = 'border: 7px solid rgb(21 149 251);' : console.log('g');
+                key == 'Банковские услуги в отделениях Почты России' ? icon.style.cssText = 'border: 7px solid rgb(21 149 251);' : console.log('g');
+                key == 'Точка выдачи наличных в магазине' ? icon.style.cssText = 'border: 7px solid rgb(255 148 47);' : console.log('g');
+                key == 'Точка оплаты наличными' ? icon.style.cssText = 'border: 7px solid rgb(11 70 119);' : console.log('g');
+                key == 'Микрофинансовая организация' ? icon.style.cssText = 'border: 7px solid rgb(239 126 234);' : console.log('g');
+                key == 'Страховая организация' ? icon.style.cssText = 'border: 7px solid rgb(21 149 251);' : console.log('g');
+
+                link.append(icon)
                 // отрисовка списка фильтров по ключу объекта filtersList
         
                 filtersList[key] == true ? link.classList.add('active') : link.classList.remove('active') // активность кнопки в зависимости от состояния фильтра
