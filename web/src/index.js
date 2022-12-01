@@ -299,55 +299,65 @@ function init () {
 
     const triangleSwitch = () => {
         triangleOpen == true ? triangle.style.cssText = 'bottom: 5px; transform: rotate(180deg);' : triangle.style.cssText = 'transform: none'
-        triangleOpen == true ? sidenavHeader.style.cssText = 'visibility: visible; top: 0' : sidenavHeader.style.cssText = 'visibility: hidden; top: -100%'
+    }
+
+    const dropFilters = () => {
+        if (triangleOpen == true) {
+            for (let key in filtersList) {
+                // перебор объекта filtersList
+        
+                let nav = document.createElement('nav')
+                nav.classList.add('menu_header')
+                sidenavHeader.append(nav)
+        
+                let list = document.createElement('ul')
+                list.classList.add('menu__list')
+                nav.append(list)
+        
+                let listItem = document.createElement('li')
+                listItem.classList.add('menu__item')
+                list.append(listItem)
+        
+                let link = document.createElement('a')
+                link.classList.add('menu__link')
+                link.textContent = `${key}`
+                console.log(filtersList[key]);
+                listItem.append(link)
+                // отрисовка списка фильтров по ключу объекта filtersList
+        
+                filtersList[key] == true ? link.classList.add('active') : link.classList.remove('active') // активность кнопки в зависимости от состояния фильтра
+        
+                link.addEventListener('click', (e) => {
+                    filtersList[key] == true ? filtersList[key] = false : filtersList[key] = true // условия для значений
+                    filtersList[key] == true ? link.classList.add('active') : link.classList.remove('active')
+        
+                    // добавление объекта с ключами и новыми значениями в OM
+                    objectManager.setFilter(getFilterFunction(filtersList));
+        
+                    // функция, которая добавляет в свойство filter содержимое объекта filtersList
+                    function getFilterFunction(categories) {
+                        return function (obj) {
+                            let content = obj.properties.typeObject;
+                            return categories[content] 
+                        }
+                    }
+                })
+            }
+        }
+        else {
+            let remove = document.querySelectorAll('.menu_header')
+            remove.forEach((item) => {
+                item.remove()
+            })
+        }
     }
 
     nameList.addEventListener('click', (e) => {
         triangleOpen == false ? triangleOpen = true : triangleOpen = false
         triangleSwitch()
+        dropFilters()
     })
 
-
-    for (let key in filtersList) {
-        // перебор объекта filtersList
-
-        let nav = document.createElement('nav')
-        nav.classList.add('menu_header')
-        sidenavHeader.append(nav)
-
-        let list = document.createElement('ul')
-        list.classList.add('menu__list')
-        nav.append(list)
-
-        let listItem = document.createElement('li')
-        listItem.classList.add('menu__item')
-        list.append(listItem)
-
-        let link = document.createElement('a')
-        link.classList.add('menu__link')
-        link.textContent = `${key}`
-        console.log(filtersList[key]);
-        listItem.append(link)
-        // отрисовка списка фильтров по ключу объекта filtersList
-
-        filtersList[key] == true ? link.classList.add('active') : link.classList.remove('active') // активность кнопки в зависимости от состояния фильтра
-
-        link.addEventListener('click', (e) => {
-            filtersList[key] == true ? filtersList[key] = false : filtersList[key] = true // условия для значений
-            filtersList[key] == true ? link.classList.add('active') : link.classList.remove('active')
-
-            // добавление объекта с ключами и новыми значениями в OM
-            objectManager.setFilter(getFilterFunction(filtersList));
-
-            // функция, которая добавляет в свойство filter содержимое объекта filtersList
-            function getFilterFunction(categories) {
-                return function (obj) {
-                    let content = obj.properties.typeObject;
-                    return categories[content] 
-                }
-            }
-        })
-    }
 
     $.ajax({
         url: "rezh.json"
